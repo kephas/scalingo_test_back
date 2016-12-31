@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"github.com/gorilla/mux"
 	"log"
+	"math"
 	"net/http"
 )
-
 
 func HumanReadableBytes(bytes float64) string {
 	var magnitude = math.Log2(bytes) / 10
@@ -29,12 +28,11 @@ func HumanReadableBytes(bytes float64) string {
 	}
 
 	if power == 0 {
-		return fmt.Sprintf("%.0f %s", (bytes/math.Pow(1024, power)), suffix)
+		return fmt.Sprintf("%.0f %s", (bytes / math.Pow(1024, power)), suffix)
 	} else {
-		return fmt.Sprintf("%.2f %s", (bytes/math.Pow(1024, power)), suffix)
+		return fmt.Sprintf("%.2f %s", (bytes / math.Pow(1024, power)), suffix)
 	}
 }
-
 
 func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
