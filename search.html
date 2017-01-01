@@ -13,10 +13,10 @@
 	{{range $repo := .}}
 	<h2><a href="{{$repo.HTMLURL}}">{{$repo.FullName}}</a></h2>
 	<table class="table table-stripped">
-	  <th>
-		<td>Language</td>
-		<td>Size</td>
-	  </th>
+	  <tr>
+		<th class="col-md-8">Language</th>
+		<th>Size</th>
+	  </tr>
 	  {{range $lang, $size := $repo.Languages}}
 	  <tr>
 		<td>{{$lang}}</td>
