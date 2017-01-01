@@ -62,7 +62,6 @@ func main() {
 	r.HandleFunc("/", StaticFileHandler("home.html"))
 	r.HandleFunc("/bootstrap.css", StaticFileHandler("bower_components/bootstrap/dist/css/bootstrap.css"))
 	r.HandleFunc("/search", SearchPage)
-	r.HandleFunc("/test", TestPage)
 
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(":8000", r))
