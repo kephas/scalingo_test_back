@@ -36,28 +36,29 @@ func GetJSONData(url string, data interface{}) (links map[string]string, err err
 }
 
 type GithubRepo struct {
-	Languages map[string]int
-	FullName string `json:"full_name"`
-	HTMLURL string `json:"html_url"`
+	Languages    map[string]int
+	FullName     string `json:"full_name"`
+	HTMLURL      string `json:"html_url"`
 	LanguagesURL string `json:"languages_url"`
 }
 
 type GithubRepoSearch struct {
-	TotalCount int `json:"total_count"`
-	IncompleteResults bool `json:"incomplete_results"`
-	Items []GithubRepo `json:"items"`
+	TotalCount        int          `json:"total_count"`
+	IncompleteResults bool         `json:"incomplete_results"`
+	Items             []GithubRepo `json:"items"`
 }
 
-
 func SearchGithub(query string) (results []GithubRepo, err error) {
-	results= make([]GithubRepo, 0, 100)
-	
+	results = make([]GithubRepo, 0, 100)
+
 	u, err := url.Parse("https://api.github.com/search/repositories?sort=updated&order=desc")
-	if err != nil { return }
+	if err != nil {
+		return
+	}
 
 	q := u.Query()
 	q.Set("q", query)
-	u.RawQuery = q.Encode()	
+	u.RawQuery = q.Encode()
 
 	var searchURL = u.String()
 	var apiData GithubRepoSearch
@@ -82,5 +83,5 @@ func SearchGithub(query string) (results []GithubRepo, err error) {
 		}
 	}
 
-	return 
+	return
 }
