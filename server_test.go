@@ -12,3 +12,8 @@ func TestHumanReadable(t *testing.T) {
 	assert.Equal(t, "7.64 kb", HumanReadableBytes(1024 * 7.64))
 	assert.Equal(t, "823 b", HumanReadableBytes(823))
 }
+
+func TestSearchAPI(t *testing.T) {
+	search, _ := SearchGithub("golang", 32)
+	assert.Equal(t, 32, len(search))
+}
