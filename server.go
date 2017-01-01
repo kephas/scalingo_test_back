@@ -41,10 +41,6 @@ func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
-func HomePage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "home.html")
-}
-
 func SearchPage(w http.ResponseWriter, r *http.Request) {
 	
 }
