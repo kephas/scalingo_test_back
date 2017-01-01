@@ -17,3 +17,9 @@ func TestSearchAPI(t *testing.T) {
 	search, _ := SearchGithub("golang", 32)
 	assert.Equal(t, 32, len(search))
 }
+
+func TestLanguagesAPI(t *testing.T) {
+	repo := GithubRepo{LanguagesURL: "https://api.github.com/repos/kephas/jedossi/languages"}
+	repo.GetLanguagesData()
+	assert.True(t, repo.Languages["Elixir"] > 0)
+}

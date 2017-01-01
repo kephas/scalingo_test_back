@@ -85,3 +85,8 @@ func SearchGithub(query string, limit int) (results []GithubRepo, err error) {
 
 	return
 }
+
+func (repo *GithubRepo) GetLanguagesData() (err error) {
+	_, err = GetJSONData(repo.LanguagesURL, &repo.Languages)
+	return
+}
