@@ -7,6 +7,8 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 func HumanReadableBytes(bytes float64) string {
@@ -41,8 +43,10 @@ func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 	}
 }
 
+var searchLimit int = 100
+
 func SearchPage(w http.ResponseWriter, r *http.Request) {
-	search, err := SearchGithub("retro")
+	search, err := SearchGithub("retro", searchLimit)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -58,6 +62,12 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	if len(os.Args) > 1 {
+		arg, err := strconv.ParseInt(os.Args[1], 0, 64)
+		if err == nil {
+			searchLimit = int(arg)
+		}
+	}
 	r := mux.NewRouter()
 	r.HandleFunc("/", StaticFileHandler("home.html"))
 	r.HandleFunc("/bootstrap.css", StaticFileHandler("bower_components/bootstrap/dist/css/bootstrap.css"))

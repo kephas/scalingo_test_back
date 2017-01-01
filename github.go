@@ -48,8 +48,8 @@ type GithubRepoSearch struct {
 	Items             []GithubRepo `json:"items"`
 }
 
-func SearchGithub(query string) (results []GithubRepo, err error) {
-	results = make([]GithubRepo, 0, 100)
+func SearchGithub(query string, limit int) (results []GithubRepo, err error) {
+	results = make([]GithubRepo, 0, limit)
 
 	u, err := url.Parse("https://api.github.com/search/repositories?sort=updated&order=desc")
 	if err != nil {
@@ -65,7 +65,7 @@ func SearchGithub(query string) (results []GithubRepo, err error) {
 	var links map[string]string
 	var ok = true
 
-	for ok && len(results) < 100 {
+	for ok && len(results) < limit {
 		links, err = GetJSONData(searchURL, &apiData)
 		searchURL, ok = links["next"]
 
@@ -75,7 +75,7 @@ func SearchGithub(query string) (results []GithubRepo, err error) {
 
 		for _, item := range apiData.Items {
 			n := len(results)
-			if n == 100 {
+			if n == limit {
 				break
 			}
 			results = results[:n+1]
