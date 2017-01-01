@@ -5,14 +5,28 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 )
 
 var httpClient = &http.Client{Timeout: 10 * time.Second}
 
-func GetJSONData(url string, data interface{}) (err error) {
+// <URL>; rel="foobar", …
+var reLink = regexp.MustCompile("<([^\\s>]+)>[\\s]*;[\\s]*rel=\\\"([^\\\"]+)\\\"")
+
+func ParseLinkHeader(header string) (targets map[string]string) {
+	targets = make(map[string]string)
+	for _, match := range reLink.FindAllStringSubmatch(header, -1) {
+		targets[match[2]] = match[1]
+	}
+	return
+}
+
+func GetJSONData(url string, data interface{}) (links map[string]string, err error) {
 	resp, err := httpClient.Get(url)
 	if err != nil {	return }
+
+	links = ParseLinkHeader(resp.Header.Get("Link"))
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {	return }
@@ -45,14 +59,27 @@ func SearchGithub(query string) (results []GithubRepo, err error) {
 	q.Set("q", query)
 	u.RawQuery = q.Encode()	
 
+	var searchURL = u.String()
 	var apiData GithubRepoSearch
-	err = GetJSONData(u.String(), &apiData)
-	if err != nil { return }
+	var links map[string]string
+	var ok = true
 
-	for _, item := range apiData.Items {
-		n := len(results)
-		results = results[:n+1]
-		results[n] = item
+	for ok && len(results) < 100 {
+		links, err = GetJSONData(searchURL, &apiData)
+		searchURL, ok = links["next"]
+
+		if err != nil {
+			return
+		}
+
+		for _, item := range apiData.Items {
+			n := len(results)
+			if n == 100 {
+				break
+			}
+			results = results[:n+1]
+			results[n] = item
+		}
 	}
 
 	return 
