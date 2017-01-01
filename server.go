@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-//	"html/template"
+	"html/template"
 	"log"
 	"math"
 	"net/http"
@@ -42,7 +42,19 @@ func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 }
 
 func SearchPage(w http.ResponseWriter, r *http.Request) {
-	
+	search, err := SearchGithub("retro")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	tmpl, err := template.ParseFiles("./search.html")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	tmpl.Execute(w, search)
 }
 
 func main() {

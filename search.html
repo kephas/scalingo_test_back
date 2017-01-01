@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+	<meta charset="utf-8">
+	<title>Github search results</title>
+	<link rel="stylesheet" type="text/css" href="/bootstrap.css"/>
+  </head>
+
+  <body class="container">
+	<h1>Github search results</h1>
+
+	{{range $repo := .}}
+	<h2><a href="{{$repo.HTMLURL}}">{{$repo.FullName}}</a></h2>
+	<table class="table table-stripped">
+	  <th>
+		<td>Language</td>
+		<td>Size</td>
+	  </th>
+	  {{range $lang, $size := $repo.Languages}}
+	  <tr>
+		<td>{{$lang}}</td>
+		<td>{{$size}}</td>
+	  </tr>
+	  {{end}}
+	</table>
+	{{end}}
+	  
+  </body>
+</html>
