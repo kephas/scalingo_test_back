@@ -1,5 +1,7 @@
 package main
 
+//go:generate bower install
+
 import (
 	"fmt"
 	"github.com/gorilla/mux"
