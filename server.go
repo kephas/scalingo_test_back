@@ -78,7 +78,7 @@ var box = rice.MustFindBox("./")
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", StaticFileHandler("home.html"))
-	r.HandleFunc("/bootstrap.css", StaticFileHandler("bower_components/bootstrap/dist/css/bootstrap.css"))
+	r.HandleFunc("/bootstrap.css", StaticFileHandler("bootstrap.css"))
 	r.HandleFunc("/search", SearchPage)
 
 	app := cli.NewApp()
