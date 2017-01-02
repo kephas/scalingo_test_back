@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/urfave/cli"
 	"html/template"
 	"log"
 	"math"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 func HumanReadableBytes(ibytes int) string {
@@ -63,17 +63,21 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	if len(os.Args) > 1 {
-		arg, err := strconv.ParseInt(os.Args[1], 0, 64)
-		if err == nil {
-			searchLimit = int(arg)
-		}
-	}
 	r := mux.NewRouter()
 	r.HandleFunc("/", StaticFileHandler("home.html"))
 	r.HandleFunc("/bootstrap.css", StaticFileHandler("bower_components/bootstrap/dist/css/bootstrap.css"))
 	r.HandleFunc("/search", SearchPage)
 
-	// Bind to a port and pass our router in
-	log.Fatal(http.ListenAndServe(":8000", r))
+	app := cli.NewApp()
+	app.Flags = []cli.Flag{
+		cli.StringFlag{Name: "port, p", Value: "8000", EnvVar: "PORT"},
+		cli.IntFlag{Name: "limit, l", Value: 100, Destination: &searchLimit},
+		cli.IntFlag{Name: "workers, w", Value: 10},
+	}
+	app.Action = func(c *cli.Context) error {
+		log.Fatal(http.ListenAndServe(":" + c.String("port"), r))
+		return nil
+	}
+
+	app.Run(os.Args)
 }
