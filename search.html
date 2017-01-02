@@ -20,7 +20,7 @@
 	  {{range $lang, $size := $repo.Languages}}
 	  <tr>
 		<td>{{$lang}}</td>
-		<td>{{$size}}</td>
+		<td>{{$size | human}}</td>
 	  </tr>
 	  {{end}}
 	</table>

@@ -11,7 +11,8 @@ import (
 	"strconv"
 )
 
-func HumanReadableBytes(bytes float64) string {
+func HumanReadableBytes(ibytes int) string {
+	var bytes = float64(ibytes)
 	var magnitude = math.Log2(bytes) / 10
 	var power float64
 	var suffix string
@@ -52,7 +53,7 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmpl, err := template.ParseFiles("./search.html")
+	tmpl, err := template.New("search.html").Funcs(template.FuncMap{"human": HumanReadableBytes}).ParseFiles("search.html")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
