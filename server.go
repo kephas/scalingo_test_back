@@ -47,7 +47,7 @@ func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 var searchLimit int = 100
 
 func SearchPage(w http.ResponseWriter, r *http.Request) {
-	search, err := SearchGithub("retro", searchLimit)
+	search, err := SearchGithub(r.URL.Query().Get("query"), searchLimit)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
