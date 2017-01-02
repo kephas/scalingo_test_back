@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/GeertJohan/go.rice"
 	"github.com/gorilla/mux"
 	"github.com/urfave/cli"
 	"html/template"
@@ -42,7 +43,9 @@ func HumanReadableBytes(ibytes int) string {
 
 func StaticFileHandler(name string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, name)
+		file, _ := box.Open(name)
+		fileinfo, _ := file.Stat()
+		http.ServeContent(w, r, name, fileinfo.ModTime(), file)
 	}
 }
 
@@ -61,7 +64,7 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 	}
 	CloseChannelsAndWait()
 
-	tmpl, err := template.New("search.html").Funcs(template.FuncMap{"human": HumanReadableBytes}).ParseFiles("search.html")
+	tmpl, err := template.New("search.html").Funcs(template.FuncMap{"human": HumanReadableBytes}).Parse(box.MustString("search.html"))
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -69,6 +72,8 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 
 	tmpl.Execute(w, search)
 }
+
+var box = rice.MustFindBox("./")
 
 func main() {
 	r := mux.NewRouter()
