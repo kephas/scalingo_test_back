@@ -1,11 +1,10 @@
 # Scalingo Backend technical test
 
-After cloning, here's how to setup and run the server:
+Here's how to install and run the server:
 
 ```sh
-$ bower install
-$ go build -o gh-search
-$ ./gh-search
+$ go get github.com/kephas/scalingo_test_back
+$ scalingo_test_back
 ```
 
 The program accepts 3 command-line arguments:
