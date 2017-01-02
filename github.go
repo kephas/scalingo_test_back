@@ -1,11 +1,13 @@
 package main
 
 import (
+	"container/ring"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"regexp"
+	"sync"
 	"time"
 )
 
@@ -89,4 +91,47 @@ func SearchGithub(query string, limit int) (results []GithubRepo, err error) {
 func (repo *GithubRepo) GetLanguagesData() (err error) {
 	_, err = GetJSONData(repo.LanguagesURL, &repo.Languages)
 	return
+}
+
+var WorkerPoolSize int
+var WorkerPool *ring.Ring
+var WorkerWg sync.WaitGroup
+
+func Worker(repos chan *GithubRepo) {
+	for repo := range repos {
+		repo.GetLanguagesData()
+	}
+	WorkerWg.Done()
+}
+
+func MakeWorker() (channel chan *GithubRepo) {
+	channel = make(chan *GithubRepo)
+	go Worker(channel)
+	return
+}
+
+func CreateWorkers() {
+	r := ring.New(WorkerPoolSize)
+	for i := 0; i < WorkerPoolSize; i++ {
+		r.Value = MakeWorker()
+		r = r.Next()
+	}
+
+	WorkerPool = r
+	WorkerWg.Add(WorkerPoolSize)
+}
+
+func DispatchRepo(repo *GithubRepo) {
+	worker := WorkerPool.Value.(chan *GithubRepo)
+	worker <- repo
+}
+
+func CloseChannelsAndWait() {
+	WorkerPool.Do(func (value interface{}) {
+		channel := value.(chan *GithubRepo)
+		if channel != nil {
+			close(channel)
+		}
+	})
+	WorkerWg.Wait()
 }

@@ -53,6 +53,12 @@ func SearchPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	CreateWorkers()
+	for index := range search {
+		DispatchRepo(&search[index])
+	}
+	CloseChannelsAndWait()
+
 	tmpl, err := template.New("search.html").Funcs(template.FuncMap{"human": HumanReadableBytes}).ParseFiles("search.html")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -72,7 +78,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{Name: "port, p", Value: "8000", EnvVar: "PORT"},
 		cli.IntFlag{Name: "limit, l", Value: 100, Destination: &searchLimit},
-		cli.IntFlag{Name: "workers, w", Value: 10},
+		cli.IntFlag{Name: "workers, w", Value: 10, Destination: &WorkerPoolSize},
 	}
 	app.Action = func(c *cli.Context) error {
 		log.Fatal(http.ListenAndServe(":" + c.String("port"), r))
